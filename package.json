@@ -1,0 +1,28 @@
+{
+	"name": "roamer-ui",
+	"version": "0.0.1",
+	"description": "ROAMer Remote Obeservation And Manipulation device UI. Using custom web component (custom-web-component.net).",
+	"author": "Paul Smith",
+	"license": "MIT",
+	"private": false,
+	"scripts": {
+		"start": "node server.js",
+		"serve": "npm start",
+		"swagger:up": "docker-compose up -d && echo 'access @ http://localhost:8181'",
+		"swagger:down": "docker-compose down"
+	},
+	"dependencies": {
+		"custom-web-component": "^1.2.7",
+		"custom-web-components": "^1.5.4",
+		"express": "^4.17.1",
+		"serialport": "^9.0.7",
+		"socket.io": "^3.1.1"
+	},
+	"devDependencies": {
+		"nodemon": "^2.0.7",
+		"fs-extra": "^7.0.1"
+	},
+	"engines": {
+		"node": ">=12.0"
+	}
+}
