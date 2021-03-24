@@ -20,8 +20,8 @@ class RoamerControl extends CustomHTMLElement {
 		this.socket;
 		this.input = {};
 
-		this._controlStick = {};
-		this._cameraStick = {};
+		this._moveStick = {};
+		this._driveStick = {};
 		this._posture;
 		this._moveDebounce;
 		this._panDebounce;
@@ -54,16 +54,21 @@ class RoamerControl extends CustomHTMLElement {
 				flex: 1 1;
 			}
 
-			.frame {
-				height: 100%;
+			.col-stick {
+				flex: 0 0 250px;
 			}
 
-			.control {
+			.frame {
+				height: 100%;
+				position: relative;
+			}
+
+			.move {
 				height: 100%;
 				opacity: 1;
 			}
 
-			.camera {
+			.drive {
 				height: 100%;
 				opacity: 1;
 			}
@@ -104,57 +109,46 @@ class RoamerControl extends CustomHTMLElement {
 
 			[disabled] .stick { background: red; }
 
-			.control .stick {
-				position: fixed;
-				left: 100px;
-				bottom: 100px;
+			.move .stick {
+				position: absolute;
+				left: 85px;
+				bottom: 85px;
 			}
 
-			.control .guide {
-				position: fixed;
-				left: 25px;
-				bottom: 25px;
+			.move .guide {
+				position: absolute;
+				left: 10px;
+				bottom: 10px;
 			}
 
-			.camera .stick {
-				position: fixed;
-				right: 100px;
-				bottom: 100px;
+			.drive .stick {
+				position: absolute;
+				right: 85px;
+				bottom: 85px;
 			}
 
-			.camera .guide {
-				position: fixed;
-				right: 25px;
-				bottom: 25px;
+			.drive .guide {
+				position: absolute;
+				right: 10px;
+				bottom: 10px;
 			}
 				
 		</style>
 
-		<div class="frame row">
-			<div class="col">
-				<div
-					class="control"
-					@mouseup="${this._stopControlMove.bind(this)}"
-					@touchend="${this._stopControlMove.bind(this)}"
-					@mousemove="${this._doControlMove.bind(this)}"
-					@touchmove="${this._doControlMove.bind(this)}"
-					?disabled="${this.isNotMovable()}"
-				>
+		<div class="frame row" @mouseup="${this._stopMove.bind(this)}" @touchend="${this._stopMove.bind(this)}">
+			<div class="col col-stick">
+				<div class="move" @mousemove="${this._doControlMove.bind(this)}" @touchmove="${this._doControlMove.bind(this)}" ?disabled="${this.isNotMovable(this._driveStick)}">
 					<span class="guide"></span>
 					<span class="stick" @mousedown="${this._startControlMove.bind(this)}" @touchstart="${this._startControlMove.bind(this)}"></span>
 				</div>
 			</div>
 			<div class="col">
-				<div
-					class="camera"
-					@mouseup="${this._stopCameraMove.bind(this)}"
-					@touchend="${this._stopCameraMove.bind(this)}"
-					@mousemove="${this._doCameraMove.bind(this)}"
-					@touchmove="${this._doCameraMove.bind(this)}"
-					?disabled="${this.isNotMovable()}"
-				>
+
+			</div>
+			<div class="col col-stick">
+				<div class="drive" @mousemove="${this._doControlDrive.bind(this)}" @touchmove="${this._doControlDrive.bind(this)}" ?disabled="${this.isNotMovable(this._moveStick)}">
 					<span class="guide"></span>
-					<span class="stick" @mousedown="${this._startCameraMove.bind(this)}" @touchstart="${this._startCameraMove.bind(this)}"></span>
+					<span class="stick" @mousedown="${this._startControlDrive.bind(this)}" @touchstart="${this._startControlDrive.bind(this)}"></span>
 				</div>
 			</div>
 		</div>
@@ -219,8 +213,8 @@ class RoamerControl extends CustomHTMLElement {
 		this.updateTemplate();
 	}
 
-	isNotMovable() {
-		return ['crab', 'walk', 'run'].indexOf(this._posture) < 0;
+	isNotMovable(control) {
+		return ['crab', 'walk', 'run'].indexOf(this._posture) < 0 || (control && control.element);
 	}
 
 	/**
@@ -230,46 +224,46 @@ class RoamerControl extends CustomHTMLElement {
 	*/
 	_startControlMove(ev) {
 		if (this.isNotMovable()) return;
-		this._controlStick = {};
-		this._controlStick.element = ev.type == 'mousemove' ? ev.target : ev.path[0];
+		this._moveStick = {};
+		this._moveStick.element = ev.type == 'mousemove' ? ev.target : ev.path[0];
+		this.updateTemplate();
+	}
+	
+	/**
+	 * @public _startControlDrive()
+	 * @param {Event} ev The event that started this
+	 * Start control stick movement
+	 */
+	_startControlDrive(ev) {
+		if (this.isNotMovable()) return;
+		this._driveStick = {};
+		this._driveStick.element = ev.type == 'mousemove' ? ev.target : ev.path[0];
+		this.updateTemplate();
 	}
 
 	/**
-	* @public _startCameraMove()
-	* @param {Event} ev The event that started this
-	* Start control stick movement
-	*/
-	_startCameraMove(ev) {
-		if (!this.isNotMovable()) return;
-		this._cameraStick = {};
-		this._cameraStick.element = ev.type == 'mousemove' ? ev.target : ev.path[0];
-	}
-
-	/**
-	* @public _stopControlMove()
+	* @public _stopMove()
 	* @param {Event} ev The event that stoped this
 	* Stop control stick movement
 	*/
-	_stopControlMove(ev) {
-		if (!this._controlStick.element) return;
+	_stopMove(ev) {
+		if (!this._moveStick.element && !this._driveStick.element) return;
 
 		this.dispatchEvent(new CustomEvent('action', { detail: { action: 'stop' } }));
 
-		this._controlStick.element.style.removeProperty('top');
-		this._controlStick.element.style.removeProperty('left');
-		this._controlStick = {};
-	}
+		if (this._moveStick.element) {
+			this._moveStick.element.style.removeProperty('bottom');
+			this._moveStick.element.style.removeProperty('left');
+			this._moveStick = {};
+		}
 
-	/**
-	* @public _stopCameraMove()
-	* @param {Event} ev The event that stoped this
-	* Stop control stick movement
-	*/
-	_stopCameraMove(ev) {
-		if (!this._cameraStick.element) return;
-		this._cameraStick.element.style.top = this._cameraStick.bound.y + 'px';
-		this._cameraStick.element.style.left = this._cameraStick.bound.x + 'px';
-		this._cameraStick = {};
+		if (this._driveStick.element) {
+			this._driveStick.element.style.removeProperty('bottom');
+			this._driveStick.element.style.removeProperty('right');
+			this._driveStick = {};
+		}
+
+		this.updateTemplate();
 	}
 
 	/**
@@ -279,77 +273,75 @@ class RoamerControl extends CustomHTMLElement {
 	*/
 	_doControlMove(ev) {
 		// TODO: Need to make this work with touch too
-		if (!this._controlStick.element) return;
+		if (!this._moveStick.element) return;
 
 		// grab movement
 		let x = ev.x || ev.touches[0].clientX;
 		let y = ev.y || ev.touches[0].clientY;
 
 		// bound and offset
-		if (!this._controlStick.bound) {
-			this._controlStick.bound = this._controlStick.element.getBoundingClientRect();
-			this._controlStick.offset = { x: x - this._controlStick.bound.x, y: y - this._controlStick.bound.y };
+		if (!this._moveStick.bound) {
+			this._moveStick.bound = this._moveStick.element.getBoundingClientRect();
+			this._moveStick.offset = { x: x - this._moveStick.bound.x, y: y - this._moveStick.bound.y };
 		}
 
 		// track amount moved for bot
-		this._controlStick.move = { x: x - this._controlStick.bound.x - this._controlStick.offset.x, y: this._controlStick.bound.y - y + this._controlStick.offset.y};
+		this._moveStick.move = { x: x - this._moveStick.bound.x - this._moveStick.offset.x, y: this._moveStick.bound.y - y + this._moveStick.offset.y};
 
 		// cap the movement to guide
-		// TODO: Need to use hypot to bind to circle form x and y
-		this._controlStick.move.x = (this._controlStick.move.x > 75 ? 75 : (this._controlStick.move.x < -75 ? -75 : this._controlStick.move.x));
-		this._controlStick.move.y = (this._controlStick.move.y > 75 ? 75 : (this._controlStick.move.y < -75 ? -75 : this._controlStick.move.y));
+		this._moveStick.move.x = (this._moveStick.move.x > 75 ? 75 : (this._moveStick.move.x < -75 ? -75 : this._moveStick.move.x));
+		this._moveStick.move.y = (this._moveStick.move.y > 75 ? 75 : (this._moveStick.move.y < -75 ? -75 : this._moveStick.move.y));
 
 		// move stick for feedback
-		this._controlStick.element.style.left = (this._controlStick.bound.x + this._controlStick.move.x) + 'px';
-		this._controlStick.element.style.top = (this._controlStick.bound.y - this._controlStick.move.y) + 'px';
+		this._moveStick.element.style.left = (85 + this._moveStick.move.x) + 'px';
+		this._moveStick.element.style.bottom = (85 + this._moveStick.move.y) + 'px';
 
 		// change to direction as a speed integer, if no change, do not fire
-		let sx = Math.round(this._controlStick.move.x / 25);
-		let sy = Math.round(this._controlStick.move.y / 25);
-		if (this._controlStick.speed && this._controlStick.speed.x === sx && this._controlStick.speed.y === sy ) return;
-		this._controlStick.speed = { x: sx, y: sy};
+		let sx = Math.round(this._moveStick.move.x / 25);
+		let sy = Math.round(this._moveStick.move.y / 25);
+		if (this._moveStick.speed && this._moveStick.speed.x === sx && this._moveStick.speed.y === sy ) return;
+		this._moveStick.speed = { x: sx, y: sy};
 		
 		this.dispatchEvent(new CustomEvent('action', { detail: { action: 'move', posture: this._posture, x: sx, y: sy } }));
 	}
 	
 	/**
-	 * @public _doCameraMove()
+	 * @public _doControlDrive()
 	 * @param {Event} ev The event that doed this
 	 * do control stick movement
 	 */
-	_doCameraMove(ev) {
+	_doControlDrive(ev) {
 		// TODO: Need to make this work with touch too
-		if (!this._cameraStick.element) return;
+		if (!this._driveStick.element) return;
 
 		// grab movement
 		let x = ev.x || ev.touches[0].clientX;
 		let y = ev.y || ev.touches[0].clientY;
 
 		// bound and offset
-		if (!this._cameraStick.bound) {
-			this._cameraStick.bound = this._cameraStick.element.getBoundingClientRect();
-			this._cameraStick.offset = { x: x - this._cameraStick.bound.x, y: y - this._cameraStick.bound.y };
+		if (!this._driveStick.bound) {
+			this._driveStick.bound = this._driveStick.element.getBoundingClientRect();
+			this._driveStick.offset = { x: x - this._driveStick.bound.x, y: y - this._driveStick.bound.y };
 		}
 
 		// track amount moved for bot
-		this._cameraStick.move = { x: x - this._cameraStick.bound.x - this._cameraStick.offset.x, y: this._cameraStick.bound.y - y + this._cameraStick.offset.y };
+		this._driveStick.move = { x: x - this._driveStick.bound.x - this._driveStick.offset.x, y: this._driveStick.bound.y - y + this._driveStick.offset.y };
 
 		// cap the movement to guide
-		// TODO: Need to use hypot to bind to circle form x and y
-		this._cameraStick.move.x = (this._cameraStick.move.x > 75 ? 75 : (this._cameraStick.move.x < -75 ? -75 : this._cameraStick.move.x));
-		this._cameraStick.move.y = (this._cameraStick.move.y > 75 ? 75 : (this._cameraStick.move.y < -75 ? -75 : this._cameraStick.move.y));
+		this._driveStick.move.x = (this._driveStick.move.x > 75 ? 75 : (this._driveStick.move.x < -75 ? -75 : this._driveStick.move.x));
+		this._driveStick.move.y = (this._driveStick.move.y > 75 ? 75 : (this._driveStick.move.y < -75 ? -75 : this._driveStick.move.y));
 
 		// move stick for feedback
-		this._cameraStick.element.style.left = (this._cameraStick.bound.x + this._cameraStick.move.x) + 'px';
-		this._cameraStick.element.style.top = (this._cameraStick.bound.y - this._cameraStick.move.y) + 'px';
+		this._driveStick.element.style.right = (85 - this._driveStick.move.x) + 'px';
+		this._driveStick.element.style.bottom = (85 + this._driveStick.move.y) + 'px';
 
-		// fire event
-		let mx = this._cameraStick.move.x;
-		let my = this._cameraStick.move.y;
-		clearTimeout(this._moveDebounce);
-		this._moveDebounce = setTimeout(() => {
-			this.dispatchEvent(new CustomEvent('action', { detail: { action: 'pan', direction: 'left' } }));
-		}, 10);
+		// change to direction as a speed integer, if no change, do not fire
+		let sx = Math.round(this._driveStick.move.x / 25);
+		let sy = Math.round(this._driveStick.move.y / 25);
+		if (this._driveStick.speed && this._driveStick.speed.x === sx && this._driveStick.speed.y === sy) return;
+		this._driveStick.speed = { x: sx, y: sy };
+
+		this.dispatchEvent(new CustomEvent('action', { detail: { action: 'drive', posture: this._posture, x: sx, y: sy } }));
 	}
 }
 

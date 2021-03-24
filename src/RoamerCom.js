@@ -13,6 +13,7 @@ export default class RoamerCom {
 	constructor(notification, request, response) {
 		this.connection;
 		
+		// console.log('NOTE: uncomment to turn back on socket');
 		this.socket = io('http://localhost:3000', { forceNew: false });
 
 		this.socket.on('notification', this._notification.bind(this, notification));

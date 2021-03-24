@@ -67,7 +67,7 @@ class RoamerMenu extends CustomHTMLElement {
 
 			.button:hover { opacity: 1; }
 			.button.right { float: right; }
-			.button[selected], .green { background: green; }
+			.button[selected], .green { background: green; opacity: 1; }
 
 			.button .text {
 				padding-right: 15px;

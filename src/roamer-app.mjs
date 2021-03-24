@@ -33,9 +33,11 @@ class RoamerApp extends CustomHTMLElement {
 			<style>
 				/* Style auto encapsulates in shadowDOM or shims for IE */
 				:host { 
-					display: block;
+					display: flex;
 					width: 100%;
 					height: 100%;
+					justify-content: center;
+					align-items: center;
 				}
 
 				.row {
@@ -54,6 +56,8 @@ class RoamerApp extends CustomHTMLElement {
 					flex-flow: column;
 					width: 100%;
 					height: 100%;
+					max-width: 1024px;
+					max-height: 400px;
 				}
 			</style>
 
