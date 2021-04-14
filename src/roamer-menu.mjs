@@ -19,7 +19,7 @@ class RoamerMenu extends CustomHTMLElement {
 		super();
 
 		this.socket;
-		this.connection;
+		this._connection;
 		this.connecting;
 		this.timeout;
 		this.posture;
@@ -82,26 +82,14 @@ class RoamerMenu extends CustomHTMLElement {
 		</style>
 
 		<div class="frame">
-			<div class="button" ?hidden="${this.connection}" @click="${this._connect.bind(this)}">
+			<div class="button" ?hidden="${this._connection}" @click="${this._connect.bind(this)}">
 				<cwc-icon-material-image class="icon" name="leakRemove"></cwc-icon-material-image>
 				<span class="text" ?hidden="${this.connecting || this.listening}">Disconnected</span>
 				<span class="text" ?hidden="${!this.connecting}">Connecting...</span>
 				<span class="text" ?hidden="${!this.listening}">Listening...</span>
 			</div>
-			<div class="button green" ?hidden="${!this.connection}" @click="${this._disconnect.bind(this)}">
+			<div class="button green" ?hidden="${!this._connection}" @click="${this._disconnect.bind(this)}">
 				<cwc-icon-material-image class="icon" name="leakAdd"></cwc-icon-material-image>
-			</div>
-			<div class="button right" ?hidden="${!this.connection}" ?selected="${this.posture === 'run'}" @click="${this._doPosture.bind(this, 'run')}">
-				<cwc-icon-material-map class="icon" name="directionsRun"></cwc-icon-material-general>
-			</div>
-			<div class="button right" ?hidden="${!this.connection}" ?selected="${this.posture === 'walk'}" @click="${this._doPosture.bind(this, 'walk')}">
-				<cwc-icon-material-map class="icon" name="directionsWalk"></cwc-icon-material-general>
-			</div>
-			<div class="button right" ?hidden="${!this.connection}" ?selected="${this.posture === 'crab'}" @click="${this._doPosture.bind(this, 'crab')}">
-				<cwc-icon-material-general class="icon" name="accessibility"></cwc-icon-material-general>
-			</div>
-			<div class="button right" ?hidden="${!this.connection}" ?selected="${this.posture === 'sit'}" @click="${this._doPosture.bind(this, 'sit')}">
-				<cwc-icon-material-notification class="icon" name="airlineSeatReclineNormal"></cwc-icon-material-general>
 			</div>
 		</div>
 		`;
@@ -173,7 +161,7 @@ class RoamerMenu extends CustomHTMLElement {
 
 			setTimeout(() => {
 				this.listening = false 
-				this.connection = true;
+				this._connection = true;
 				this.updateTemplate();
 			}, 2000);
 		}, 2000);
@@ -181,7 +169,7 @@ class RoamerMenu extends CustomHTMLElement {
 
 	disconnect() {
 		this.connecting = false;
-		this.connection = false;
+		this._connection = false;
 		this.updateTemplate();
 	}
 
@@ -194,12 +182,6 @@ class RoamerMenu extends CustomHTMLElement {
 
 	_disconnect() {
 		this.dispatchEvent(new CustomEvent('action', { detail: { action: 'disconnect' }}));
-	}
-
-	_doPosture(type) {
-		this.posture = type;
-		this.updateTemplate();
-		this.dispatchEvent(new CustomEvent('action', { detail: { action: 'posture', posture: type }}));
 	}
 }
 

@@ -14,7 +14,7 @@ export default class RoamerCom {
 		this.connection;
 		
 		// console.log('NOTE: uncomment to turn back on socket');
-		this.socket = io('http://localhost:3000', { forceNew: false });
+		this.socket = io('http://192.168.1.17:3000', { forceNew: false });
 
 		this.socket.on('notification', this._notification.bind(this, notification));
 		this.socket.on('roamer-request', this._roamerRequest.bind(this, request));
@@ -40,39 +40,42 @@ export default class RoamerCom {
 	_notification(notification, message) {
 		if (!notification) return;
 		
-		notification(message);
+		notification(JSON.parse(message));
 	}
 
 	_roamerRequest(request, message) {
 		if (!request) return;
 		
-		request(message);
+		request(JSON.parse(message));
 	}
 
 	_roamerResponse(response, message) {
 		if (!response) return;
 		
-		response(message);
+		response(JSON.parse(message));
 	}
 
 	// BASIC COMMANDS
 
-	_actionHelp(data) { this.socket.emit('/action', '?') }
-	_actionStop(data) { this.socket.emit('/action', '!') }
+	_actionHelp(data) { this.socket.emit('/action', JSON.stringify(data)) }
+	_actionStop(data) { this.socket.emit('/action', JSON.stringify(data)) }
 	
 	// POSTURE
 
-	_actionPosture(data) { this.socket.emit('/action', `p ${data.posture.charAt(0)}`) }
+	_actionPosture(data) {
+		console.log(data);
+		this.socket.emit('/action', JSON.stringify(data))
+	}
 	
 	// MOVING (in posture set) - moving without changing axis
 
-	_actionMove(data) { this.socket.emit('/action', `m ${data.posture.charAt(0)} ${data.x} ${data.y}`) }
+	_actionMove(data) { this.socket.emit('/action', JSON.stringify(data)) }
 
 	// DRIVING (in posture set) - moving with axis turn, like a car drives
 
-	_actionDrive(data) { this.socket.emit('/action', `d ${data.posture.charAt(0)} ${data.x} ${data.y}`) }
+	_actionDrive(data) { this.socket.emit('/action', JSON.stringify(data)) }
 
 	// TURNING (in posture set) - no moving, just turning on the spot
 
-	_actionTurn(data) { this.socket.emit('/action', `t ${data.posture.charAt(0)} ${data.direction.charAt(0)}`) }
+	_actionTurn(data) { this.socket.emit('/action', JSON.stringify(data)) }
 }

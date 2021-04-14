@@ -69,11 +69,13 @@ class RoamerApp extends CustomHTMLElement {
 	}
 
 	_action(ev) {
-		if (ev.detail.action === 'posture') this.shadowRoot.querySelector('roamer-control').posture(ev.detail.posture);
-
 		switch (ev.detail.action) {
-			case 'connect': this.com.connect(); break;
-			case 'disconnect': this.com.disconnect(); break;
+			case 'connect': 
+				this.com.connect();
+			break;
+			case 'disconnect': 
+				this.com.disconnect();
+			break;
 			default: this.com.action(ev.detail); break;
 		}
 	}
@@ -92,9 +94,18 @@ class RoamerApp extends CustomHTMLElement {
 	_response(data) {
 		// responses from the roamer!
 		console.log('RESPONSE:', data);
-		if (data === 'connected') this.shadowRoot.querySelector('roamer-menu').connect();
-		else if (data === 'listening') this.shadowRoot.querySelector('roamer-menu').listen();
-		else if (data === 'disconnected') this.shadowRoot.querySelector('roamer-menu').disconnect();
+
+		if (data.reply === 'connected') {
+			this.shadowRoot.querySelector('roamer-menu').connect();
+			this.shadowRoot.querySelector('roamer-control').enable();
+		}
+		else if (data.reply === 'listening') {
+			this.shadowRoot.querySelector('roamer-menu').listen();
+		}
+		else if (data.reply === 'disconnected') {
+			this.shadowRoot.querySelector('roamer-menu').disconnect();
+			this.shadowRoot.querySelector('roamer-control').disable();
+		}
 	}
 }
 

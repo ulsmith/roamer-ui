@@ -20,11 +20,10 @@ class RoamerControl extends CustomHTMLElement {
 		this.socket;
 		this.input = {};
 
+		this._connection;
 		this._moveStick = {};
 		this._driveStick = {};
 		this._posture;
-		this._moveDebounce;
-		this._panDebounce;
 	}
 
 	/**
@@ -43,6 +42,8 @@ class RoamerControl extends CustomHTMLElement {
 				flex: 1 0;
 			}
 
+			[hidden] { display: none !important; }
+
 			.row {
 				display: flex;
 				flex-flow: row;
@@ -59,8 +60,20 @@ class RoamerControl extends CustomHTMLElement {
 			}
 
 			.frame {
+				display: flex;
+				flex-flow: column;
 				height: 100%;
 				position: relative;
+			}
+
+			.top {
+				flex: 1 1;
+				justify-content: flex-end;
+			}
+
+			.bottom {
+				flex: 0 0;
+				height: 220px;
 			}
 
 			.move {
@@ -132,23 +145,71 @@ class RoamerControl extends CustomHTMLElement {
 				right: 10px;
 				bottom: 10px;
 			}
+
+			.button {
+				margin: 5px;
+				display: inline-block;
+				background: #222;
+				border-radius: 25px;
+				height: 40px;
+				width: 40px;
+				opacity: 0.7;
+				cursor: pointer;
+			}
+
+			.button:hover { opacity: 1; }
+			.button.right { float: right; }
+			.button[selected], .green { background: #3c53ad; opacity: 1; }
+
+			.icon {
+				fill: white;
+				width: 40px;
+				height: 40px;
+			}
 				
 		</style>
 
-		<div class="frame row" @mouseup="${this._stopMove.bind(this)}" @touchend="${this._stopMove.bind(this)}">
-			<div class="col col-stick">
-				<div class="move" @mousemove="${this._doControlMove.bind(this)}" @touchmove="${this._doControlMove.bind(this)}" ?disabled="${this.isNotMovable(this._driveStick)}">
-					<span class="guide"></span>
-					<span class="stick" @mousedown="${this._startControlMove.bind(this)}" @touchstart="${this._startControlMove.bind(this)}"></span>
+		<div class="frame" ?hidden="${!this._connection}" @mouseup="${this._stopMove.bind(this)}" @touchend="${this._stopMove.bind(this)}">
+			<div class="row top">
+				<div class="button" ?selected="${this._posture === 'sit'}" @click="${this._doPosture.bind(this, 'sit')}">
+					<cwc-icon-material-notification class="icon" name="airlineSeatReclineNormal"></cwc-icon-material-general>
+				</div>
+				<div class="button" ?selected="${this._posture === 'crab'}" @click="${this._doPosture.bind(this, 'crab')}">
+					<cwc-icon-material-general class="icon" name="accessibility"></cwc-icon-material-general>
+				</div>
+				<div class="button" ?selected="${this._posture === 'walk'}" @click="${this._doPosture.bind(this, 'walk')}">
+					<cwc-icon-material-map class="icon" name="directionsWalk"></cwc-icon-material-general>
+				</div>
+				<div class="button" ?selected="${this._posture === 'run'}" @click="${this._doPosture.bind(this, 'run')}">
+					<cwc-icon-material-map class="icon" name="directionsRun"></cwc-icon-material-general>
 				</div>
 			</div>
-			<div class="col">
-
-			</div>
-			<div class="col col-stick">
-				<div class="drive" @mousemove="${this._doControlDrive.bind(this)}" @touchmove="${this._doControlDrive.bind(this)}" ?disabled="${this.isNotMovable(this._moveStick)}">
-					<span class="guide"></span>
-					<span class="stick" @mousedown="${this._startControlDrive.bind(this)}" @touchstart="${this._startControlDrive.bind(this)}"></span>
+			<div class="row bottom">
+				<div class="col col-stick">
+					<div class="move" @mousemove="${this._doControlMove.bind(this)}" @touchmove="${this._doControlMove.bind(this)}" ?disabled="${this.isNotMovable(this._driveStick)}">
+						<span class="guide"></span>
+						<span class="stick" @mousedown="${this._startControlMove.bind(this)}" @touchstart="${this._startControlMove.bind(this)}"></span>
+					</div>
+				</div>
+				<div class="col">
+					<div class="row">
+						<div class="col">
+							<div class="button">
+								<cwc-icon-material-image ?hidden="${!this._connection}" class="icon" name="leakAdd"></cwc-icon-material-image>
+							</div>
+						</div>
+						<div class="col">
+							<div class="button">
+								<cwc-icon-material-image ?hidden="${!this._connection}" class="icon" name="leakAdd"></cwc-icon-material-image>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col col-stick">
+					<div class="drive" @mousemove="${this._doControlDrive.bind(this)}" @touchmove="${this._doControlDrive.bind(this)}" ?disabled="${this.isNotMovable(this._moveStick)}">
+						<span class="guide"></span>
+						<span class="stick" @mousedown="${this._startControlDrive.bind(this)}" @touchstart="${this._startControlDrive.bind(this)}"></span>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -208,13 +269,26 @@ class RoamerControl extends CustomHTMLElement {
 		
 	}
 
-	posture(posture) {
-		this._posture = posture;
+	enable() {
+		setTimeout(() => {
+			this._connection = true;
+			this.updateTemplate();
+		}, 4000);
+	}
+
+	disable() {
+		this._connection = false;
 		this.updateTemplate();
 	}
 
 	isNotMovable(control) {
 		return ['crab', 'walk', 'run'].indexOf(this._posture) < 0 || (control && control.element);
+	}
+
+	_doPosture(type) {
+		this._posture = type;
+		this.updateTemplate();
+		this.dispatchEvent(new CustomEvent('action', { detail: { action: 'posture', posture: type } }));
 	}
 
 	/**
