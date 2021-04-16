@@ -1,4 +1,5 @@
 import { CustomHTMLElement, html } from "../node_modules/custom-web-component/index.js";
+import "../node_modules/custom-web-components/src/icon/material/index.js";
 
 /**
  * RoamerControl
@@ -44,20 +45,9 @@ class RoamerControl extends CustomHTMLElement {
 
 			[hidden] { display: none !important; }
 
-			.row {
-				display: flex;
-				flex-flow: row;
-			}
-
-			.col {
-				display: flex;
-				flex-flow: column;
-				flex: 1 1;
-			}
-
-			.col-stick {
-				flex: 0 0 250px;
-			}
+			.row { display: flex; flex-flow: row; }
+			.col { display: flex; flex-flow: column; flex: 1 1; }
+			.col-stick { flex: 0 0 250px; }
 
 			.frame {
 				display: flex;
@@ -66,29 +56,12 @@ class RoamerControl extends CustomHTMLElement {
 				position: relative;
 			}
 
-			.top {
-				flex: 1 1;
-				justify-content: flex-end;
-			}
-
-			.bottom {
-				flex: 0 0;
-				height: 220px;
-			}
-
-			.move {
-				height: 100%;
-				opacity: 1;
-			}
-
-			.drive {
-				height: 100%;
-				opacity: 1;
-			}
-
-			[disabled] {
-				opacity: 0.5;
-			}
+			.top { flex: 1 1; justify-content: flex-end; align-items: center; }
+			.bottom { flex: 0 0; height: 220px; }
+			.move { height: 100%; opacity: 1; }
+			.drive { height: 100%; opacity: 1; }
+			.center-buttons { align-items: center; }
+			[disabled] { opacity: 0.5; }
 
 			.guide {
 				display: inline-block;
@@ -122,29 +95,10 @@ class RoamerControl extends CustomHTMLElement {
 
 			[disabled] .stick { background: red; }
 
-			.move .stick {
-				position: absolute;
-				left: 85px;
-				bottom: 85px;
-			}
-
-			.move .guide {
-				position: absolute;
-				left: 10px;
-				bottom: 10px;
-			}
-
-			.drive .stick {
-				position: absolute;
-				right: 85px;
-				bottom: 85px;
-			}
-
-			.drive .guide {
-				position: absolute;
-				right: 10px;
-				bottom: 10px;
-			}
+			.move .stick { position: absolute; left: 85px; bottom: 85px; }
+			.move .guide { position: absolute; left: 10px; bottom: 10px; }
+			.drive .stick { position: absolute;	right: 85px; bottom: 85px; }
+			.drive .guide { position: absolute; right: 10px; bottom: 10px; }
 
 			.button {
 				margin: 5px;
@@ -160,17 +114,32 @@ class RoamerControl extends CustomHTMLElement {
 			.button:hover { opacity: 1; }
 			.button.right { float: right; }
 			.button[selected], .green { background: #3c53ad; opacity: 1; }
-
-			.icon {
-				fill: white;
-				width: 40px;
-				height: 40px;
-			}
-				
+			.icon { fill: white; width: 40px; height: 40px; }
 		</style>
 
 		<div class="frame" ?hidden="${!this._connection}" @mouseup="${this._stopMove.bind(this)}" @touchend="${this._stopMove.bind(this)}">
 			<div class="row top">
+				<div class="button">
+					<cwc-icon-material-general class="icon" name="help"></cwc-icon-material-general>
+				</div>
+				<div class="button">
+					<cwc-icon-material-general class="icon" name="help"></cwc-icon-material-general>
+				</div>
+				<div class="button">
+					<cwc-icon-material-general class="icon" name="help"></cwc-icon-material-general>
+				</div>
+				<div class="button">
+					<cwc-icon-material-general class="icon" name="help"></cwc-icon-material-general>
+				</div>
+				<div class="button">
+					<cwc-icon-material-general class="icon" name="help"></cwc-icon-material-general>
+				</div>
+				<div class="button">
+					<cwc-icon-material-general class="icon" name="help"></cwc-icon-material-general>
+				</div>
+				<div class="button">
+					<cwc-icon-material-general class="icon" name="help"></cwc-icon-material-general>
+				</div>
 				<div class="button" ?selected="${this._posture === 'sit'}" @click="${this._doPosture.bind(this, 'sit')}">
 					<cwc-icon-material-notification class="icon" name="airlineSeatReclineNormal"></cwc-icon-material-general>
 				</div>
@@ -193,14 +162,32 @@ class RoamerControl extends CustomHTMLElement {
 				</div>
 				<div class="col">
 					<div class="row">
-						<div class="col">
+						<div class="col center-buttons">
 							<div class="button">
-								<cwc-icon-material-image ?hidden="${!this._connection}" class="icon" name="leakAdd"></cwc-icon-material-image>
+								<cwc-icon-material-general class="icon" name="help"></cwc-icon-material-general>
+							</div>
+							<div class="button">
+								<cwc-icon-material-general class="icon" name="help"></cwc-icon-material-general>
+							</div>
+							<div class="button">
+								<cwc-icon-material-general class="icon" name="help"></cwc-icon-material-general>
+							</div>
+							<div class="button">
+								<cwc-icon-material-general class="icon" name="help"></cwc-icon-material-general>
 							</div>
 						</div>
-						<div class="col">
+						<div class="col center-buttons">
 							<div class="button">
-								<cwc-icon-material-image ?hidden="${!this._connection}" class="icon" name="leakAdd"></cwc-icon-material-image>
+								<cwc-icon-material-general class="icon" name="help"></cwc-icon-material-general>
+							</div>
+							<div class="button">
+								<cwc-icon-material-general class="icon" name="help"></cwc-icon-material-general>
+							</div>
+							<div class="button">
+								<cwc-icon-material-general class="icon" name="help"></cwc-icon-material-general>
+							</div>
+							<div class="button">
+								<cwc-icon-material-general class="icon" name="help"></cwc-icon-material-general>
 							</div>
 						</div>
 					</div>
@@ -273,7 +260,7 @@ class RoamerControl extends CustomHTMLElement {
 		setTimeout(() => {
 			this._connection = true;
 			this.updateTemplate();
-		}, 4000);
+		}, 2000);
 	}
 
 	disable() {

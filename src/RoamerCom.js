@@ -14,7 +14,7 @@ export default class RoamerCom {
 		this.connection;
 		
 		// console.log('NOTE: uncomment to turn back on socket');
-		this.socket = io('http://192.168.1.17:3000', { forceNew: false });
+		this.socket = io('http://192.168.1.99:3000', { forceNew: false });
 
 		this.socket.on('notification', this._notification.bind(this, notification));
 		this.socket.on('roamer-request', this._roamerRequest.bind(this, request));
@@ -39,7 +39,7 @@ export default class RoamerCom {
 
 	_notification(notification, message) {
 		if (!notification) return;
-		
+
 		notification(JSON.parse(message));
 	}
 
@@ -62,10 +62,7 @@ export default class RoamerCom {
 	
 	// POSTURE
 
-	_actionPosture(data) {
-		console.log(data);
-		this.socket.emit('/action', JSON.stringify(data))
-	}
+	_actionPosture(data) { this.socket.emit('/action', JSON.stringify(data)) }
 	
 	// MOVING (in posture set) - moving without changing axis
 

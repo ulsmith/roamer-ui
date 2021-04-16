@@ -163,8 +163,8 @@ class RoamerMenu extends CustomHTMLElement {
 				this.listening = false 
 				this._connection = true;
 				this.updateTemplate();
-			}, 2000);
-		}, 2000);
+			}, 1000);
+		}, 1000);
 	}
 
 	disconnect() {

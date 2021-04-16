@@ -4,6 +4,8 @@
 	<title>ROAMer</title>
 	
 	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<link rel="manifest" href="manifest.json">
 
 	<!-- Socket IO client -->
 	<script src="/node_modules/socket.io/client-dist/socket.io.js"></script>
@@ -27,6 +29,19 @@
 		body { 
 			background: url(back2.jpg) no-repeat center center fixed;
 			background-color: #222;		
+		}
+
+		@media screen and (min-width: 320px) and (max-width: 767px) and (orientation: portrait) {
+			/* html {
+				transform: rotate(-90deg);
+				transform-origin: left top;
+				width: 100vh;
+				height: 100vw;
+				overflow-x: hidden;
+				position: absolute;
+				top: 100%;
+				left: 0;
+			} */
 		}
 	</style>
   </head>

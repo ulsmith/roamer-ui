@@ -68,6 +68,10 @@ class RoamerApp extends CustomHTMLElement {
 		`;
 	}
 
+	connected() {
+
+	}
+
 	_action(ev) {
 		switch (ev.detail.action) {
 			case 'connect': 
@@ -97,10 +101,8 @@ class RoamerApp extends CustomHTMLElement {
 
 		if (data.reply === 'connected') {
 			this.shadowRoot.querySelector('roamer-menu').connect();
-			this.shadowRoot.querySelector('roamer-control').enable();
-		}
-		else if (data.reply === 'listening') {
 			this.shadowRoot.querySelector('roamer-menu').listen();
+			this.shadowRoot.querySelector('roamer-control').enable();
 		}
 		else if (data.reply === 'disconnected') {
 			this.shadowRoot.querySelector('roamer-menu').disconnect();

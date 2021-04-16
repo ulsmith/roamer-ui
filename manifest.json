@@ -1,0 +1,10 @@
+{
+	"name": "ROAMer",
+	"short_name": "roamer",
+	"description": "Roamer",
+	"display": "fullscreen",
+	"orientation": "landscape",
+	"icons": [
+	],
+	"start_url": "/"
+}
